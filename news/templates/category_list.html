@@ -1,0 +1,67 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% load custom_tags %}
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+<h1 class="text-center"> Все новости <span class="text-muted fs-6 fn-normal"> Всего: {{ page_obj.paginator.count}}</span> </h1>
+    {% if not is_subscriber %}
+        <p class="text-center"> <a href="{% url 'subscribe' category.id%}" class="btn-sm"> Подписаться </a> </p>
+
+{% endif %}
+<hr>
+
+<ul class="list-group list-group-flush">
+
+    {%  for post in category_news_list %}
+    <li class="list-group-item">
+        <small class="fm-bold">{{ post.date | date:'d M Y' }} </small>
+        <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+        <small class="text-muted">(автор: {{ post.author}})</small> <br>
+        <small class="fm-bold"> категории:
+            {% for category in post.categoryThrough.all %}
+                <a href="{% url 'category_list' category.id %}">{{ category }}</a>
+            {% endfor %}
+        </small>
+        <p> {{new.text|truncatechars:20}}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href=""><li>Контакты</li></a>
+
+
+{% if not is_subscribe %}
+Вы можете подписаться на данную категорию
+     {% for category in postCategory %}
+         <button><a href="add_subscribe/pk={{category.id}}">{{postCategory}}</a></button>
+      {% endfor %}
+{% endif %}
+
+    <h2> Новостей нет </h2>
+
+{% if page_obj.has_previous %}
+
+    <a href="?{% url_replace page=1 %}">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+
+    {% endif %}
+{% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+
+        <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+
+        {% endif %}
+    {% endif %}
+
+{% endblock content %}

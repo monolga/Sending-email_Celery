@@ -1,0 +1,83 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% load custom_tags %}
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+<h1 class="text-center"> Все новости <span class="text-muted fs-6 fn-normal"> Всего: {{ page_obj.paginator.count}}</span> </h1>
+<hr>
+
+<a href=""><li>Контакты</li></a>
+{% if posts %}
+<div class="table-responsive">
+  <table class="table align-middle">
+
+        <tr>
+
+            <td>Статья</td>
+            <td>Автор</td>
+            <td> Дата </td>
+            <td> Текст </td>
+            <td> Тип </td>
+
+        </tr>
+        {% for new in posts %}
+        <tr>
+
+            <td> <a href="{% url 'post_detail' new.id %}">{{ new.title }}</a></td>
+            <td><small class="text-muted">(автор: {{ new.author}})</small> <br></td>
+            <td><small class="fm-bold">{{new.dateCreation|date:'d M Y' }} </small> </td>
+            <td>{{ new.text|truncatechars:20 }} </td>
+            <td>{{ new.get_categoryType_display }}{{post.categoryType}}
+              {% if not is_subscribe %}
+            <b> Подписаться на данную категорию </b>
+                 {% for category in post.postCategory.all %}
+            <a class="btn" href="add_subscribe/{{ category.id }}">
+                <button type="submit" value="follow" name="pk" class="btn btn-light btn-outline-danger">{{ category }}</button>
+            </a>
+
+                {% endfor %}
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+{% endif %}
+
+
+{% if is_subscribe %}
+Вы можете отписаться от данной категории
+     {% for category in post.postCategory.all %}
+         <button><a href="add_subscribe/ pk={{category.id}}">{{category}}</a></button>
+      {% endfor %}
+{% endif %}
+
+    <h2> Новостей нет </h2>
+
+{% if page_obj.has_previous %}
+
+    <a href="?{% url_replace page=1 %}">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+
+    {% endif %}
+{% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+
+        <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+
+   {% endif %}
+{% endif %}
+
+{% endblock content %}
